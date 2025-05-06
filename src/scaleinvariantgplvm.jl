@@ -32,7 +32,7 @@ function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; 
 
     # verify bound
     
-    verify ? verify_bound(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N, backend = backend) : nothing
+    verify ? verify_bound_scaleinvariantgplvm(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N, backend = backend) : nothing
 
     #############################################################
 
