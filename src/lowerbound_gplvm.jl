@@ -48,43 +48,45 @@ end
 
 
 
-# #-----------------------------------------------------
-# function lowerbound_slow(Y, S, β, c, X, μ, w, θ) 
-# #-----------------------------------------------------
+#-----------------------------------------------------
+function lowerbound_gplvm_slow(Y, S, net, λ, β, X, w, θ) 
+#-----------------------------------------------------
 
-#     D, N = size(μ)
-        
-#     @assert(size(Y) == size(μ)); @assert(length(c) == N); @assert(size(X, 2) ==  N)
+    D, N = size(Y)
+
+    @assert(size(X, 2) ==  N)
+
+    K = calculateK(X, θ)
+
+    μ = net(w, X); @assert(size(Y) == size(μ)); 
+
+    Λ = Diagonal(λ)
+
+    Σ = Symmetric(inv(Λ)*((inv(Λ) + K)\K)) #calculateposteriorcov(K, λroot)
 
 
-#     K = calculateK(X, θ)
-
-#     C = Diagonal(c)
-
-#     Σ = calculateposteriorcov(K, C, β, S)
-
-#     aux = zero(eltype(μ))
+    aux = zero(eltype(μ))
 
 
-#     for d in 1:D
+    for d in 1:D
 
-#         Sᵦ =  Diagonal(S[d,:]) + I/β
+        Sᵦ =  Diagonal(S[d,:]) + I/β
 
-#         aux += logpdf(MvNormal(C*μ[d,:], Sᵦ), Y[d,:])
+        aux += logpdf(MvNormal(μ[d,:], Sᵦ), Y[d,:])
 
-#         aux += -0.5*tr(C * inv(Sᵦ) * C * Σ)
+        aux += -0.5*tr(inv(Sᵦ) * Σ)
 
-#         aux += logpdf(MvNormal(zeros(N), K), μ[d,:])
+        aux += logpdf(MvNormal(zeros(N), K), μ[d,:])
 
-#         aux += -0.5*tr(K \ Σ)
+        aux += -0.5*tr(K \ Σ)
 
-#         aux += entropy(MvNormal(zeros(N), Σ))
+        aux += entropy(MvNormal(zeros(N), Σ))
 
-#     end
+    end
 
-#     aux += quadratic_penalty(w, α = 1e-0) + quadratic_penalty(X, α = 1e-0)
+    aux += quadratic_penalty(w, α = 1e-0) + quadratic_penalty(X, α = 1e-0)
 
-#     return aux 
+    return aux 
 
-# end
+end
 

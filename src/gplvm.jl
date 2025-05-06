@@ -30,9 +30,11 @@ function gplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; Q = 2, iterati
 
     S = σ.^2
 
+    
     # verify bound
     
-    # verify_bound(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N)
+    verify ? verify_bound_gplvm(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N) : nothing
+
 
     #############################################################
 
