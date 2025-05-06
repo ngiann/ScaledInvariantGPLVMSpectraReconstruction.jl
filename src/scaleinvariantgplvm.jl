@@ -34,25 +34,7 @@ function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; 
     
     verify ? verify_bound_scaleinvariantgplvm(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N, backend = backend) : nothing
 
-    #############################################################
-
-    # if verify
-    #     let
-
-    #         local helper(p) = -lowerbound(Y, S, net, unpack_scaleinvariantgplvm(p, net, Q, N, Val(optimisescale))...)
-
-    #         local grad_ad_all = DifferentiationInterface.gradient(helper, AutoMooncake(config=nothing), p₀)
-
-    #         grad_ad_manual_all = helper_grad(p₀, Y, S, net, D, Q, N, optimisescale)
-
-    #         display([vec(grad_ad_all) vec(grad_ad_manual_all) abs.(vec(grad_ad_all)-vec(grad_ad_manual_all))])
-
-    #         @printf("max discr for grad is %.8f\n", maximum(abs.(vec(grad_ad_all) - vec(grad_ad_manual_all))))
-
-    #     end
-    # end
-
-
+    
     #------------------------------------------------------------
     # Setup and solve optimisation problem
     #------------------------------------------------------------
