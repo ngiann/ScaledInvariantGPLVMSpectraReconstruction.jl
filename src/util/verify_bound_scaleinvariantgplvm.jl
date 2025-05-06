@@ -1,4 +1,4 @@
-function verify_bound(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N, backend = backend)
+function verify_bound_scaleinvariantgplvm(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N, backend = backend)
 
     l1 = lowerbound(Y, S, backend, unpack_scaleinvariantgplvm(p₀, net, Q, N)...)
         
