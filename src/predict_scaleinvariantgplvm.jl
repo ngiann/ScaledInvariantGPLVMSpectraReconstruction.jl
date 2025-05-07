@@ -9,8 +9,6 @@ function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D =
 
     Λ = Diagonal(λ) # N × N
 
-    # μ = net(w, X); # D × N
-
     K⁻¹μ = K\μ'
 
 
