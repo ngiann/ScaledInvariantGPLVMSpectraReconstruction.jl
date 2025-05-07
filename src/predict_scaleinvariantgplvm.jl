@@ -1,4 +1,10 @@
-function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D = D)
+function scaleinvariantgplvmpredictive(; backend = backend, net = net, res = res, Q = Q, N = N, D = D)
+
+    _scaleinvariantgplvmpredictive(backend, net = net, res = res, Q = Q, N = N, D = D)
+
+end
+
+function _scaleinvariantgplvmpredictive(::LinearBackend; net = net, res = res, Q = Q, N = N, D = D)
 
     μ, λ, β, c, X, w, θ = unpack_scaleinvariantgplvm(res.minimizer, net, Q, N)
 
@@ -17,42 +23,38 @@ function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D =
 
     #-------------------------------------------------------------------------
 
-    function predmean(x)
+    function predictiveposterior(x::Vector)
 
-        local Kx = calculateK(x, X, θ) # Nx × N
+        local Kx = calculateK(reshape(x, Q, 1), X, θ) # Nx × N
 
-        local Kxx = calculateK(x, x, θ) # Nx × Nx
+        local Kxx = calculateK(reshape(x, Q, 1), reshape(x, Q, 1), θ) # Nx × Nx
 
-        # calculate predictive based on posterior
         local m = (Kx * K⁻¹μ)'
 
-        return m
+        local P = (Kxx - Kx*((K + inv(Λ))\Kx'))
+
+        return vec(m), only(P)
 
     end
+
+
+    function predmean(x)
+
+        predictiveposterior(x)[1]
+
+    end
+
 
     
-    function getloglikel(y, σ)
+    function getloglikel(y::Vector{T}, σ::Vector{T}) where T<:Real
 
         function f(x, c)
 
-            local C = Diagonal(c)
-
-            local Kx = calculateK(x, X, θ) # Nx × N
-
-            local Kxx = calculateK(x, x, θ) # Nx × N
-
-            # calculate predictive based on posterior
-            local m = (Kx * K⁻¹μ)'
-
-            local P = Symmetric(Kxx - Kx*((K + inv(Λ))\Kx'))
+            local m, σ²pred = predictiveposterior(x)
    
             local aux = quadratic_penalty(x; α = 1e-0)
             
-            for d in 1:D
-           
-                aux += logpdf(MvNormal(C*m[d,:],  Diagonal(σ[d,:].^2 .+ 1.0./β) + Symmetric(C*P*C)), y[d,:])
-           
-            end
+            aux += logpdf(MvNormal(c*m, Diagonal(vec(σ.^2 .+ 1.0./β .+ c * c * σ²pred))), y)
 
             aux += loglikelihood(priorc, c)
 
@@ -62,26 +64,15 @@ function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D =
     end
 
 
-    function getloglikel(B, y, σ)
+    function getloglikel(B, y::Vector{T}, σ::Vector{T}) where T<:Real
 
         function f(x, c)
 
-            local C = Diagonal(c)
+            local m, σ²pred = predictiveposterior(x)
 
-            local Kx = calculateK(x, X, θ) # Nx × N
-
-            local Kxx = calculateK(x, x, θ) # Nx × N
-
-            # calculate predictive based on posterior
-            local m = (Kx * K⁻¹μ)'
-
-            local BmC = B*(m*C)
-
-            local CPC = C*Symmetric(Kxx - Kx*((K + inv(Λ))\Kx'))*C
-   
             local aux = quadratic_penalty(x; α = 1e-0)
             
-            aux += logpdf(MvNormal(vec(BmC), Diagonal(vec(σ).^2) + Symmetric(kron((CPC+(I/β)), B*B'))), vec(y))
+            aux += logpdf(MvNormal(c*B*m, Diagonal(σ.^2) + (1.0./β + c*c*σ²pred)*(B*B')), vec(y))
 
             aux += loglikelihood(priorc, c)
 
@@ -91,13 +82,13 @@ function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D =
     end
 
 
-    function unpk(p, Nx)
+    function unpk(p)
 
         local MARK = 0
 
-        local x = reshape(p[MARK+1:MARK+Nx*Q], Q, Nx); MARK += Q*Nx
+        local x = reshape(p[MARK+1:MARK+Q], Q); MARK += Q
 
-        local c = softplus.(p[MARK+1:MARK+Nx]); MARK += Nx
+        local c = softplus(p[MARK+1]); MARK += 1
 
         @assert(length(p) == MARK) # make sure we used up all elements in p
 
@@ -106,67 +97,62 @@ function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D =
     end
 
 
-    function infer(y, σ; repeat = 30, seed = 1)
+    function infer(y::Vector{T}, σ::Vector{T}; repeat = 30, seed = 1) where T<:Real
 
         local rng = MersenneTwister(seed)
-
-        local Nx = size(y, 2)
 
         local ℓ = getloglikel(y, σ)
 
         local opt = Optim.Options(iterations = 10000, show_trace = true, show_every = 1)
 
-        local helper = x -> - ℓ(unpk(x,Nx)...)
+        local helper = x -> - ℓ(unpk(x)...)
 
-        local minoptfunc() = Optim.optimize(helper, [vec(X[:,rand(rng, 1:N, Nx)]);invsoftplus.(ones(Nx))], LBFGS(), opt, autodiff = AutoMooncake(config = nothing))
+        local minoptfunc() = Optim.optimize(helper, [vec(X[:,rand(rng, 1:N)]); invsoftplus(1)], LBFGS(), opt, autodiff = AutoMooncake(config = nothing))
 
-        return unpk(repeatoptimisation(minoptfunc, repeat), Nx)
+        return unpk(repeatoptimisation(minoptfunc, repeat))
 
     end
 
 
-    function infer(B, y, σ; repeat = 30, seed = 1)
+    function infer(B, y::Vector{T}, σ::Vector{T}; repeat = 30, seed = 1) where T<:Real
 
         local rng = MersenneTwister(seed)
-
-        local Nx = size(y, 2)
 
         local ℓ = getloglikel(B, y, σ)
 
         local opt = Optim.Options(iterations = 100_000, show_trace = true, show_every = 1)
         
-        local helper = x -> - ℓ(unpk(x,Nx)...)
+        local helper = x -> - ℓ(unpk(x)...)
 
-        local minoptfunc() = Optim.optimize(helper, [vec(X[:,rand(rng, 1:N, Nx)]);invsoftplus.(ones(Nx))], ConjugateGradient(), opt, autodiff = AutoMooncake(config = nothing))
-        # local minoptfunc() = Optim.optimi ze(helper, [vec(randn(Q,Nx));invsoftplus.(ones(Nx))], ConjugateGradient(), opt, autodiff = AutoMooncake(config = nothing))
-
-        return unpk(repeatoptimisation(minoptfunc, repeat), Nx)
+        local minoptfunc() = Optim.optimize(helper, [vec(X[:,rand(rng, 1:N)]);invsoftplus(1)], LBFGS(), opt, autodiff = AutoMooncake(config = nothing))
+       
+        return unpk(repeatoptimisation(minoptfunc, repeat))
 
     end
 
 
-    function getvilogl(y, σ)
+    function getvilogl(y::Vector{T}, σ::Vector{T}) where T<:Real
 
-        local Nx = size(y, 2); @assert(size(y) == size(σ))
+        @assert(size(y) == size(σ))
 
         local ℓ = getloglikel(y, σ)
 
-        local freenp = Q*Nx + Nx
+        local freenp = Q*1 + 1
 
-        return freenp, x -> ℓ(unpk(x, Nx)...)
+        return freenp, x -> ℓ(unpk(x)...)
 
     end
 
 
-    function getvilogl(B, y, σ)
+    function getvilogl(B, y::Vector{T}, σ::Vector{T}) where T<:Real
 
-        local Nx = size(y, 2); @assert(size(y) == size(σ))
+        @assert(size(y) == size(σ))
 
         local ℓ = getloglikel(B, y, σ)
 
-        local freenp = Q*Nx + Nx
+        local freenp = Q*1 + 1
 
-        return freenp, x -> ℓ(unpk(x, Nx)...)
+        return freenp, x -> ℓ(unpk(x)...)
 
     end
 
