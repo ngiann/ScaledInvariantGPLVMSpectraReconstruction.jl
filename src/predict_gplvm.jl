@@ -68,9 +68,9 @@ function gplvmpredictive(; net = net, res = res, Q = Q, N = N, D = D)
             # calculate predictive based on posterior
             local m = (Kx * K⁻¹μ)'
 
-            local Bm = B*m
-
             local P = Symmetric(Kxx - Kx*((K + inv(Λ))\Kx'))
+            
+            local Bm = B*m
    
             local aux = quadratic_penalty(x; α = 1e-0)
             
