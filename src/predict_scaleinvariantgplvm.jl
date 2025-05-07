@@ -147,44 +147,6 @@ function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D =
     end
 
 
-    # function inferseries(B, t, y, σ; repeat = 1, seed = 1, iterations = 1)
-
-    #     local Nx = size(y, 2)
-
-    #     # local res = [infer(B, y[:,[i]], σ[:,[i]]; repeat = repeat, seed = seed) for i in 1:Nx]
-
-    #     # local X0 = reduce(hcat, [r[1] for r in res])
-       
-    #     # local c  = reduce(vcat, [r[2] for r in res])
-
-    #     local net = create_rbfnet(M = 25, r = 0.1, Q = Q, tobs = t)
-
-    #     # local W = X0 * net.Φ' / (net.Φ * net.Φ' + 1e-6*I)
-
-    #     local ℓ = getloglikel(B, y, σ)
-
-    #     local opt = Optim.Options(iterations = iterations, show_trace = true, show_every = 5)
-        
-    #     local aux(p) = net(p[1:numparam(net)]), softplus.(p[numparam(net)+1:end])
-
-    #     # return  ((Q * net.M) + Nx), x -> ℓ(aux(x)...)
-    #     local helper = x -> - ℓ(aux(x)...)
-
-    #     # local minoptfunc() = Optim.optimize(helper, [vec(W); invsoftplus.(c)], ConjugateGradient(), opt, autodiff = AutoMooncake(config = nothing))
-
-
-    #     local minoptfunc() = Optim.optimize(helper, [vec(randn(Q,net.M)); invsoftplus.(ones(Nx))], ConjugateGradient(), opt, autodiff = AutoMooncake(config = nothing))
-
-    #     local uopt = repeatoptimisation(minoptfunc, repeat)
-        
-    #     local Wopt = reshape(uopt[1:numparam(net)], Q, net.M)
-
-    #     return net(Wopt), get_t(net, Wopt, 0.1)
-
-    # end
-
-
-
     function getvilogl(y, σ)
 
         local Nx = size(y, 2); @assert(size(y) == size(σ))
