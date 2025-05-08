@@ -1,4 +1,4 @@
-function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}; Q = 2, iterations = 100, seed = 1, H = 30, verify = false, backend = backend) where T<:Real
+function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}; Q = 2, iterations = 100, seed = 1, H = 30, verify = false, backend = LinearBackend()) where T<:Real
 
     rng = MersenneTwister(seed)
 
