@@ -1,12 +1,9 @@
 function scaleinvariantgplvmpredictive(; backend = backend, net = net, res = res, Q = Q, N = N, D = D)
 
-    _scaleinvariantgplvmpredictive(backend, net = net, res = res, Q = Q, N = N, D = D)
 
-end
+function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D = D)
 
-function _scaleinvariantgplvmpredictive(::LinearBackend; net = net, res = res, Q = Q, N = N, D = D)
-
-    μ, λ, β, c, X, w, θ = unpack_scaleinvariantgplvm(res.minimizer, net, Q, N)
+    μ, λ, β, _ν, _τ, X, w, θ = unpack_scaleinvariantgplvm(res.minimizer, net, Q, N)
 
 
     # calculate posterior mean and covariance
