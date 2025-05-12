@@ -1,1 +1,1 @@
-default_JITTER() = 1e-4
+default_JITTER() = 1e-6
