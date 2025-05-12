@@ -1,4 +1,4 @@
-function initialscaleinvariantgplvmsolution(rng, Q, N, net)
+function initialmlscaleinvariantgplvmsolution(rng, Q, N, net)
 
     λ = ones(N)*100#rand(rng, N)
 

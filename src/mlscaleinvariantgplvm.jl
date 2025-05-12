@@ -1,4 +1,4 @@
-function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}; Q = 2, iterations = 100, seed = 1, H = 30, verify = false, backend = LinearBackend()) where T<:Real
+function mlscaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}; Q = 2, iterations = 100, seed = 1, H = 30, verify = false, backend = LinearBackend()) where T<:Real
 
     rng = MersenneTwister(seed)
 
@@ -6,14 +6,14 @@ function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}; Q = 2, iterations = 10
 
     net = ThreeLayerNetwork(in = Q, H1 = H, H2 = H, out = D)
     
-    p₀ = initialscaleinvariantgplvmsolution(rng, Q, N, net)
+    p₀ = initialmlscaleinvariantgplvmsolution(rng, Q, N, net)
 
-    scaleinvariantgplvm(Y, σ, p₀, net; Q = Q, iterations = iterations, verify = verify, backend = backend)
+    mlscaleinvariantgplvm(Y, σ, p₀, net; Q = Q, iterations = iterations, verify = verify, backend = backend)
 
 end
 
 
-function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; Q = 2, iterations = 1, verify = false, backend = backend) where T<:Real
+function mlscaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; Q = 2, iterations = 1, verify = false, backend = backend) where T<:Real
 
     #------------------------------------------------------------
     # Check dimensions and preliminaries
@@ -23,7 +23,7 @@ function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; 
 
     numparam = numberofparameters_mlscaleinvariantgplvm(N, Q, net)
     
-    @printf("siGPLVM: There are %d data items of dimension %d\n", N, D)
+    @printf("simlGPLVM: There are %d data items of dimension %d\n", N, D)
     @printf("Optimising %d number of free parameters\n", numparam)
 
     # Calculate observed diagonal covariance matrices

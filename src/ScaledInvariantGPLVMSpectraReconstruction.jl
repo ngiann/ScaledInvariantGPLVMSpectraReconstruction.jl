@@ -18,7 +18,7 @@ module ScaledInvariantGPLVMSpectraReconstruction
 
     include("AbstractBackend.jl")
     # include("loadmnist.jl")
-    include("initialscaleinvariantgplvmsolution.jl")
+    include("initialmlscaleinvariantgplvmsolution.jl")
     include("calculatecovariance.jl")
     # include("gp.jl")
     # include("rectifiergp.jl")
