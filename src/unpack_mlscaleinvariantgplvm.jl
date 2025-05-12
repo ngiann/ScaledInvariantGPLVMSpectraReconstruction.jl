@@ -1,4 +1,4 @@
-@stable function unpack_scaleinvariantgplvm(parameters, net, Q, N)
+@stable function unpack_mlscaleinvariantgplvm(parameters, net, Q, N)
 
     @assert(numberofparameters_mlscaleinvariantgplvm(N, Q, net) == length(parameters))
     

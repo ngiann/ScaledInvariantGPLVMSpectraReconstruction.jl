@@ -53,6 +53,6 @@ module ScaledInvariantGPLVMSpectraReconstruction
     
     export  gplvm, scaleinvariantgplvm, scaleinvariantgplvmpredictive, gplvmpredictive
     
-    include("unpack_scaleinvariantgplvm.jl")
+    include("unpack_mlscaleinvariantgplvm.jl")
 
 end

@@ -39,7 +39,7 @@ function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; 
     # Setup and solve optimisation problem
     #------------------------------------------------------------
 
-    helper(p) = -lowerbound(Y, S, backend, unpack_scaleinvariantgplvm(p, net, Q, N)...)
+    helper(p) = -lowerbound(Y, S, backend, unpack_mlscaleinvariantgplvm(p, net, Q, N)...)
 
     opt = Optim.Options(iterations = iterations, show_trace = true, show_every = 10)
 
@@ -48,7 +48,7 @@ function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; 
 
     return let
 
-        local _mu,_λ, _β, c, X, w, _θ = unpack_scaleinvariantgplvm(res.minimizer, net, Q, N)
+        local _mu,_λ, _β, c, X, w, _θ = unpack_mlscaleinvariantgplvm(res.minimizer, net, Q, N)
 
         local rec = net(w, X)
 
