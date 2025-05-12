@@ -1,8 +1,8 @@
-function verify_bound_scaleinvariantgplvm(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N, backend = backend)
+function verify_bound_mlscaleinvariantgplvm(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N, backend = backend)
 
-    l1 = lowerbound(Y, S, backend, unpack_scaleinvariantgplvm(p₀, net, Q, N)...)
+    l1 = mllowerbound(Y, S, backend, unpack_mlscaleinvariantgplvm(p₀, net, Q, N)...)
         
-    l2 = lowerbound_slow(Y, S, backend, unpack_scaleinvariantgplvm(p₀, net, Q, N)...)
+    l2 = mllowerbound_slow(Y, S, backend, unpack_mlscaleinvariantgplvm(p₀, net, Q, N)...)
         
     # l3  = marginalloglikelihood(Y, S, unpack_gplvm(p₀, net, D, Q, N)...)
 

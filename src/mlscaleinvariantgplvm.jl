@@ -39,7 +39,7 @@ function mlscaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net
     # Setup and solve optimisation problem
     #------------------------------------------------------------
 
-    helper(p) = -lowerbound(Y, S, backend, unpack_mlscaleinvariantgplvm(p, net, Q, N)...)
+    helper(p) = -mllowerbound(Y, S, backend, unpack_mlscaleinvariantgplvm(p, net, Q, N)...)
 
     opt = Optim.Options(iterations = iterations, show_trace = true, show_every = 10)
 

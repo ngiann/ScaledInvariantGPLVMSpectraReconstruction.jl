@@ -22,7 +22,7 @@ module ScaledInvariantGPLVMSpectraReconstruction
     include("calculatecovariance.jl")
     # include("gp.jl")
     # include("rectifiergp.jl")
-    include("util/verify_bound_scaleinvariantgplvm.jl")
+    include("util/verify_bound_mlscaleinvariantgplvm.jl")
     include("util/verify_bound_gplvm.jl")
     include("util/woodbury.jl")
     include("util/default_JITTER.jl")
@@ -33,9 +33,9 @@ module ScaledInvariantGPLVMSpectraReconstruction
     include("gaussianentropy.jl")
     include("expectation_log_prior.jl")
 
-    include("scaleinvariantgplvm.jl")
+    include("mlscaleinvariantgplvm.jl")
     include("numberofparameters_mlscaleinvariantgplvm.jl")
-    include("lowerbound.jl")
+    include("mllowerbound.jl")
     # include("grad/lowerbound_for_AD.jl")
     # include("grad/helper_grad_manual.jl")
     # include("grad/helper_grad_ad.jl")
@@ -51,7 +51,7 @@ module ScaledInvariantGPLVMSpectraReconstruction
     include("predict_scaleinvariantgplvm.jl")
     include("predict_gplvm.jl")
     
-    export  gplvm, scaleinvariantgplvm, scaleinvariantgplvmpredictive, gplvmpredictive
+    export  gplvm, mlscaleinvariantgplvm, scaleinvariantgplvmpredictive, gplvmpredictive
     
     include("unpack_mlscaleinvariantgplvm.jl")
 
