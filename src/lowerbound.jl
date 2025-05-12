@@ -4,7 +4,7 @@
                               
     D, N = size(Y)
 
-    numobservations = sum(!isinf, Y)
+    # numobservations = sum(!isinf, Y)
 
     @assert(length(ν) == length(τ) == N); @assert(size(X, 2) ==  N)
 
@@ -14,7 +14,7 @@
 
     Σ = Symmetric(inv(Λ)*((inv(Λ) + K)\K)) #calculateposteriorcov(K, λroot)
 
-    aux = - 0.5*numobservations*log(2π)
+    aux = zero(eltype(μ)) # - 0.5*numobservations*log(2π)
 
     @inbounds for n in 1:N, d in 1:D
 
