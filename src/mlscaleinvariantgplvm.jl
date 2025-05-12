@@ -13,7 +13,7 @@ function mlscaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}; Q = 2, iterations = 
 end
 
 
-function mlscaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; Q = 2, iterations = 1, verify = false, backend = backend) where T<:Real
+function mlscaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; Q = 2, iterations = 1, verify = false, backend = LinearBackend()) where T<:Real
 
     #------------------------------------------------------------
     # Check dimensions and preliminaries
