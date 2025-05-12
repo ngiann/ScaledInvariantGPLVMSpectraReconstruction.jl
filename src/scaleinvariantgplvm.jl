@@ -1,4 +1,4 @@
-function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}; Q = 2, iterations = 100, seed = 1, H = 30, verify = false, backend = LinearBackend()) where T<:Real
+function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}; Q = 2, iterations = 100, seed = 1, H = 30, verify = false) where T<:Real
 
     rng = MersenneTwister(seed)
 
@@ -8,12 +8,12 @@ function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}; Q = 2, iterations = 10
     
     p₀ = initialscaleinvariantgplvmsolution(rng, Q, N, net)
 
-    scaleinvariantgplvm(Y, σ, p₀, net; Q = Q, iterations = iterations, verify = verify, backend = backend)
+    scaleinvariantgplvm(Y, σ, p₀, net; Q = Q, iterations = iterations, verify = verify)
 
 end
 
 
-function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; Q = 2, iterations = 1, verify = false, backend = backend) where T<:Real
+function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; Q = 2, iterations = 1, verify = false) where T<:Real
 
     #------------------------------------------------------------
     # Check dimensions and preliminaries
@@ -32,14 +32,14 @@ function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; 
 
     # verify bound
     
-    verify ? verify_bound_scaleinvariantgplvm(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N, backend = backend) : nothing
+    # verify ? verify_bound_scaleinvariantgplvm(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N) : nothing
 
     
     #------------------------------------------------------------
     # Setup and solve optimisation problem
     #------------------------------------------------------------
 
-    helper(p) = -lowerbound(Y, S, backend, unpack_scaleinvariantgplvm(p, net, Q, N)...)
+    helper(p) = -lowerbound(Y, S, unpack_scaleinvariantgplvm(p, net, Q, N)...)
 
     opt = Optim.Options(iterations = iterations, show_trace = true, show_every = 10)
 
@@ -48,11 +48,15 @@ function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; 
 
     return let
 
-        local _mu,_λ, _β, c, X, w, _θ = unpack_scaleinvariantgplvm(res.minimizer, net, Q, N)
+        local _mu,_λ, _β, ν, τ, X, w, _θ = unpack_scaleinvariantgplvm(res.minimizer, net, Q, N)
 
         local rec = net(w, X)
 
-        X, rec, res, net, res.minimum, c
+        c̄    = [g(νₙ, τₙ) for (νₙ, τₙ) in zip(ν, τ)]
+
+        cvar = [v(νₙ, τₙ) for (νₙ, τₙ) in zip(ν, τ)]
+
+        X, rec, res, net, res.minimum, c̄, cvar
 
     end
     

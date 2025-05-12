@@ -1,3 +1,5 @@
+
+
 function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D = D)
 
     μ, λ, β, _ν, _τ, X, w, θ = unpack_scaleinvariantgplvm(res.minimizer, net, Q, N)
@@ -13,7 +15,7 @@ function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D =
 
 
 
-    local priorc = Uniform(1e-3, 100.0)
+    local priorc = truncated(Normal(0, 1000.0), lower = 0.0)####################################### Uniform(1e-3, 100.0)
 
     #-------------------------------------------------------------------------
 
@@ -50,7 +52,7 @@ function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D =
             
             aux += logpdf(MvNormal(c*m, Diagonal(vec(σ.^2 .+ 1.0./β .+ c * c * σ²pred))), y)
 
-            # aux += loglikelihood(priorc, c)
+            aux += loglikelihood(priorc, c)
 
             return aux
         end
@@ -118,7 +120,7 @@ function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D =
         
         local helper = x -> - ℓ(unpk(x)...)
 
-        local minoptfunc() = Optim.optimize(helper, [vec(X[:,rand(rng, 1:N)]);invsoftplus(1)], NelderMead(), opt, autodiff = AutoMooncake(config = nothing))
+        local minoptfunc() = Optim.optimize(helper, [vec(X[:,rand(rng, 1:N)]);invsoftplus(1)], LBFGS(), opt, autodiff = AutoMooncake(config = nothing))
        
         return unpk(repeatoptimisation(minoptfunc, repeat))
 

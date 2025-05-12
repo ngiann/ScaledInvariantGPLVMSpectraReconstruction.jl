@@ -46,6 +46,7 @@ module ScaledInvariantGPLVMSpectraReconstruction
     include("initialgplvmsolution.jl")
     include("numberofparameters_gplvm.jl")
     include("unpack_gplvm.jl")
+    include("truncatednormal.jl")
 
 
     include("predict_scaleinvariantgplvm.jl")

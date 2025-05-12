@@ -4,7 +4,9 @@ function initialscaleinvariantgplvmsolution(rng, Q, N, net)
 
     β = 1.0
     
-    c = ones(N)#rand(rng, N)*3
+    ν = ones(N)
+
+    τ = ones(N)
     
     X = randn(rng, Q*N)*1
     
@@ -12,6 +14,6 @@ function initialscaleinvariantgplvmsolution(rng, Q, N, net)
 
     θ = 100.0
 
-    [invsoftplus.(λ); invsoftplus(β); invsoftplus.(c); X; w; invsoftplus(θ)]
+    [invsoftplus.(λ); invsoftplus(β); ν; invsoftplus.(τ); X; w; invsoftplus(θ)]
 
 end
