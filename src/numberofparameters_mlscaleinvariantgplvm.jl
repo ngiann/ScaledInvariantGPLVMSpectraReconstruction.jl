@@ -1,4 +1,4 @@
-function numberofparameters_scaleinvariantgplvm(N, Q, net)
+function numberofparameters_mlscaleinvariantgplvm(N, Q, net)
 
     N + 2 + N + Q*N + ForwardNeuralNetworks.numweights(net)
 

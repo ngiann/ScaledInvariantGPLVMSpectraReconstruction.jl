@@ -21,7 +21,7 @@ function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; 
 
     D, N = size(Y); @assert(size(Y) == size(σ))
 
-    numparam = numberofparameters_scaleinvariantgplvm(N, Q, net)
+    numparam = numberofparameters_mlscaleinvariantgplvm(N, Q, net)
     
     @printf("siGPLVM: There are %d data items of dimension %d\n", N, D)
     @printf("Optimising %d number of free parameters\n", numparam)

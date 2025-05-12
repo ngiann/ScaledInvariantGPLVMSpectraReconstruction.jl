@@ -34,7 +34,7 @@ module ScaledInvariantGPLVMSpectraReconstruction
     include("expectation_log_prior.jl")
 
     include("scaleinvariantgplvm.jl")
-    include("numberofparameters_scaleinvariantgplvm.jl")
+    include("numberofparameters_mlscaleinvariantgplvm.jl")
     include("lowerbound.jl")
     # include("grad/lowerbound_for_AD.jl")
     # include("grad/helper_grad_manual.jl")

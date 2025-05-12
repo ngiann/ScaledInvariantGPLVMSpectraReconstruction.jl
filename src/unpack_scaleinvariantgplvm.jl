@@ -1,6 +1,6 @@
 @stable function unpack_scaleinvariantgplvm(parameters, net, Q, N)
 
-    @assert(numberofparameters_scaleinvariantgplvm(N, Q, net) == length(parameters))
+    @assert(numberofparameters_mlscaleinvariantgplvm(N, Q, net) == length(parameters))
     
     nwts = ForwardNeuralNetworks.numweights(net)
 
