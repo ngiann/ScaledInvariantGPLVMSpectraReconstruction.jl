@@ -32,7 +32,7 @@ function mlscaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net
 
     # verify bound
     
-    verify ? verify_bound_scaleinvariantgplvm(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N, backend = backend) : nothing
+    verify ? verify_bound_mlscaleinvariantgplvm(p₀; Y = Y, S = S, net = net, D = D, Q = Q, N = N, backend = backend) : nothing
 
     
     #------------------------------------------------------------
@@ -48,7 +48,7 @@ function mlscaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net
 
     return let
 
-        local _mu,_λ, _β, c, X, w, _θ = unpack_mlscaleinvariantgplvm(res.minimizer, net, Q, N)
+        local _mu,_λ, _β, X, c, w, _θ = unpack_mlscaleinvariantgplvm(res.minimizer, net, Q, N)
 
         local rec = net(w, X)
 

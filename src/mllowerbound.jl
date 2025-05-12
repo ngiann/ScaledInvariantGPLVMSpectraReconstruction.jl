@@ -1,5 +1,5 @@
 #-----------------------------------------------------
-@stable function mllowerbound(Y, S, backend, μ, λ, β, c, X, w, θ)::Float64
+@stable function mllowerbound(Y, S, backend, μ, λ, β, X, c, w, θ)::Float64
 #-----------------------------------------------------
 
     D, N = size(Y)
@@ -51,7 +51,7 @@ end
 
 
 #-----------------------------------------------------
-function mllowerbound_slow(Y, S, backend, μ, λ, β, c, X, w, θ) 
+function mllowerbound_slow(Y, S, backend, μ, λ, β, X, c, w, θ) 
 #-----------------------------------------------------
 
     D, N = size(μ)

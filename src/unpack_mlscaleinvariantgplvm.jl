@@ -10,9 +10,9 @@
 
     β = softplus(parameters[MARK+1]); MARK += 1
     
-    c = softplus.(parameters[MARK+1:MARK+N]); MARK += N
-
     X = reshape(parameters[MARK+1:MARK+Q*N], Q, N); MARK += Q*N
+    
+    c = softplus.(parameters[MARK+1:MARK+N]); MARK += N
 
     w = parameters[MARK+1:MARK+nwts]; MARK += nwts
     
@@ -22,6 +22,6 @@
 
     μ = net(w, X)
 
-    return μ, λ, β, c, X, w, θ
+    return μ, λ, β, X, c, w, θ
 
 end
