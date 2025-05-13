@@ -1,5 +1,5 @@
 #-----------------------------------------------------
-@stable function lowerbound(Y, S, μ, λ, β, ν, τ, X, w, θ)::Float64
+@stable function lowerbound(Y, S, μ, λ, β, X, ν, τ, w, θ)::Float64
 #-----------------------------------------------------
                               
     D, N = size(Y)
@@ -64,7 +64,7 @@ end
 
 
 #-----------------------------------------------------
-function lowerbound_slow(Y, S, backend, μ, λ, β, c, X, w, θ) 
+function lowerbound_slow(Y, S, backend, μ, λ, β, X, c, w, θ) 
 #-----------------------------------------------------
 
     D, N = size(μ)

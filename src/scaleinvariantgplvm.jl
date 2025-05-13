@@ -48,7 +48,7 @@ function scaleinvariantgplvm(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}, net; 
 
     return let
 
-        local _mu,_λ, _β, ν, τ, X, w, _θ = unpack_scaleinvariantgplvm(res.minimizer, net, Q, N)
+        local _mu,_λ, _β, X, ν, τ, w, _θ = unpack_scaleinvariantgplvm(res.minimizer, net, Q, N)
 
         local rec = net(w, X)
 
