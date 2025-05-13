@@ -19,8 +19,8 @@ function scaleinvariantgplvmpredictive(; net = net, res = res, Q = Q, N = N, D =
 
 
 
-    local priorc = Uniform(1e-3, 100.0)
-
+    local priorc = truncated(Normal(0, 1000), lower = 0.0)
+    
     #-------------------------------------------------------------------------
 
     function predictiveposterior(x::Vector)
