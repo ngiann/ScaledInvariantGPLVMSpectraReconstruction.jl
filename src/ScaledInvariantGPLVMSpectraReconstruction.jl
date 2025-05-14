@@ -55,4 +55,6 @@ module ScaledInvariantGPLVMSpectraReconstruction
     
     include("unpack_mlscaleinvariantgplvm.jl")
     include("unpack_scaleinvariantgplvm.jl")
+
+    include("ppca.jl"); export ppca 
 end
