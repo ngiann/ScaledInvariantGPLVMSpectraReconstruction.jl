@@ -79,11 +79,45 @@ function ppca(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}; Q = 2, iterations = 
 
         local L = inv(Sₙ + I/β)
 
-        local Σpost⁻¹ = Symmetric(I + cₙ^2*W'*L*W) # see 2.117 in PRML
+        local Σpost⁻¹ = Symmetric(I + (cₙ^2)*W'*L*W) # see 2.117 in PRML
 
         local μpost = Σpost⁻¹\(cₙ*W'*L*(yₙ - cₙ*b))
 
         return μpost, Symmetric(inv(Σpost⁻¹))
+
+    end
+
+
+    #------------------------------------------------------------
+    function reconstruct(B, ϕ, σ, W, b, β, Z; retries = retries)
+    #------------------------------------------------------------
+
+        # verify dimensions
+        @assert(length(ϕ) == length(σ))
+        @assert(size(B, 1) == length(ϕ))
+        @assert(size(B, 2) == D)
+    
+        local S = Diagonal(σ.^2)
+
+        function unpack(p)
+            @assert(length(p) == Q+1)
+            softplus(p[1]), p[2:end]
+        end
+
+        recobjective(c, z) = logpdf(MvNormal(c*B*(W*z + b), S + I/β), ϕ)
+        
+        local helper(p) = - recobjective(unpack(p)...)  
+
+        local opt = Optim.Options(iterations=100_000)
+   
+        local res = [optimize(helper, [invsoftplus(1); Z[rand(1:N)]], NelderMead(), opt) for _ in 1:retries]
+
+        local bestindex = argmin([r.minimum for r in res])
+
+        local copt, zopt = unpack(res[bestindex].minimizer)
+        
+        # retunrs reconstructed object and latent coordinate
+        return copt*(W*zopt + b), zopt
 
     end
 
@@ -99,17 +133,23 @@ function ppca(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}; Q = 2, iterations = 
     res = optimize(helper, p₀, ConjugateGradient(), opt, autodiff = AutoMooncake(config = nothing))
 
 
-    X = let
+    #------------------------------------------------------------
+    # Return coordinates X and optimised parameter vector
+    #------------------------------------------------------------
+
+    X, rec, reconstuct = let
 
         local W, b, c, β = unpack_ppca(res.minimizer)
 
-        local X = [posterior(Y[:,n], Diagonal(S[:,n]), W, b, c[n], β)[1] for n in 1:N]
+        local Z = [posterior(Y[:,n], Diagonal(S[:,n]), W, b, c[n], β)[1] for n in 1:N]
         
-        reduce(hcat, X)
+        local rec = reduce(hcat, [c[n]*(W*Z[n] + b) for n in 1:N])
+
+        reduce(hcat, Z), rec, (B, ϕ, σ; retries = 10) -> reconstruct(B, ϕ, σ, W, b, β, Z; retries = retries)
 
     end
-
-    X, res.minimizer
+    
+    X, res.minimizer, rec, reconstuct
     
 end
 
