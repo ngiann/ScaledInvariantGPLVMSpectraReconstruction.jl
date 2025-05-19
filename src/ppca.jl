@@ -137,7 +137,7 @@ function ppca(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}; Q = 2, iterations = 
     # Return coordinates X and optimised parameter vector
     #------------------------------------------------------------
 
-    X, rec, reconstuct = let
+    X, rec, reconstuct, c = let
 
         local W, b, c, β = unpack_ppca(res.minimizer)
 
@@ -145,12 +145,12 @@ function ppca(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}; Q = 2, iterations = 
         
         local rec = reduce(hcat, [c[n]*(W*Z[n] + b) for n in 1:N])
 
-        reduce(hcat, Z), rec, (B, ϕ, σ; retries = 10) -> reconstruct(B, ϕ, σ, W, b, β, Z; retries = retries)
+        reduce(hcat, Z), rec, (B, ϕ, σ; retries = 10) -> reconstruct(B, ϕ, σ, W, b, β, Z; retries = retries), c
 
     end
     
-    X, res.minimizer, rec, reconstuct
-    
+    X, res.minimizer, rec, reconstuct, res.minimum, c
+
 end
 
 
