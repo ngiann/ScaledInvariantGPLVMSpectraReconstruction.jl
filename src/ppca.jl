@@ -89,8 +89,10 @@ function ppca(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}; Q = 2, iterations = 
 
 
     #------------------------------------------------------------
-    function reconstruct(B, ϕ, σ, W, b, β, Z; retries = retries)
+    function reconstruct(B, ϕ, σ, W, b, β, Z; retries = retries, seed = 1)
     #------------------------------------------------------------
+        
+        rng = MersenneTwister(seed)
 
         # verify dimensions
         @assert(length(ϕ) == length(σ))
@@ -110,7 +112,7 @@ function ppca(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}; Q = 2, iterations = 
 
         local opt = Optim.Options(iterations=100_000)
    
-        local res = [optimize(helper, [invsoftplus(1); Z[rand(1:N)]], NelderMead(), opt) for _ in 1:retries]
+        local res = [optimize(helper, [invsoftplus(1); Z[rand(rng, 1:N)]], NelderMead(), opt) for _ in 1:retries]
 
         local bestindex = argmin([r.minimum for r in res])
 
@@ -145,7 +147,7 @@ function ppca(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}; Q = 2, iterations = 
         
         local rec = reduce(hcat, [c[n]*(W*Z[n] + b) for n in 1:N])
 
-        reduce(hcat, Z), rec, (B, ϕ, σ; retries = 10) -> reconstruct(B, ϕ, σ, W, b, β, Z; retries = retries), c
+        reduce(hcat, Z), rec, (B, ϕ, σ; retries = 10, seed = 1) -> reconstruct(B, ϕ, σ, W, b, β, Z; retries = retries, seed = seed), c
 
     end
     
