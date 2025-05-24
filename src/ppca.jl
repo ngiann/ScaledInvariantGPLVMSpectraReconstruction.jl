@@ -58,13 +58,19 @@ function ppca(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}; Q = 2, iterations = 
     function marginaloglikelihood(W, b, c, β)
     #------------------------------------------------------------
 
-        local aux = zero(eltype(W))
-
-        local WWᵀ = Symmetric(W*W')
+        local aux = zero(eltype(W)) 
+        
+        local Iq = Diagonal(ones(Q))
 
         for n in 1:N
 
-            aux += logpdf(MvNormal(c[n]*b, Diagonal(S[:,n]) + I/β + c[n]*c[n]*WWᵀ), Y[:,n])
+            # aux += logpdf(MvNormal(c[n]*b, Diagonal(S[:,n]) + I/β + c[n]*c[n]*WWᵀ), Y[:,n])
+
+            local R = SymWoodbury(Diagonal(S[:,n].+1/β), c[n]*W, Iq)
+
+            local diff = (c[n]*b - Y[:,n])
+
+            aux += - 0.5*diff'*(R\diff) - 0.5*logdet(R)
 
         end
 
@@ -132,7 +138,7 @@ function ppca(Y::Matrix{T}, σ::Matrix{T}, p₀::Vector{T}; Q = 2, iterations = 
 
     opt = Optim.Options(iterations = iterations, show_trace = true, show_every = 1)
 
-    res = optimize(helper, p₀, ConjugateGradient(), opt, autodiff = AutoMooncake(config = nothing))
+    res = optimize(helper, p₀, LBFGS(), opt, autodiff = AutoMooncake(config = nothing))
 
 
     #------------------------------------------------------------
