@@ -12,6 +12,7 @@ module ScaledInvariantGPLVMSpectraReconstruction
     using Random
     import RectifierExpectations
     using StatsFuns
+    using WoodburyMatrices
     
     
     using ForwardNeuralNetworks
